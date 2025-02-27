@@ -10,8 +10,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      
       - name: Set up Xcode
         run: sudo xcode-select -s /Applications/Xcode_16.2.app
+      
       - name: Build and Archive
         run: |
           xcodebuild -version
@@ -23,26 +25,3 @@ jobs:
             CODE_SIGN_IDENTITY=- \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
-      - name: Export IPA (if needed)
-        run: |
-          # Create a minimal exportOptions.plist if it doesn't exist
-          if [ ! -f exportOptions.plist ]; then
-            cat > exportOptions.plist << EOF
-            <?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-            <plist version="1.0">
-            <dict>
-                <key>method</key>
-                <string>development</string>
-                <key>signingStyle</key>
-                <string>automatic</string>
-            </dict>
-            </plist>
-            EOF
-          fi
-          
-          xcodebuild -exportArchive \
-            -archivePath ${{ github.workspace }}/build/Hyperlink.xcarchive \
-            -exportOptionsPlist exportOptions.plist \
-            -exportPath ${{ github.workspace }}/build \
-            -allowProvisioningUpdates
