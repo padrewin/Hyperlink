@@ -6,13 +6,30 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		8D5EAC882D6F1E380068F4C8 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 8D5EAC872D6F1E380068F4C8 /* LaunchAtLogin */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
-		8D5EAC652D6F1CE60068F4C8 /* Hyperlink.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hyperlink.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8DDFD5E52D70AB0600FFAA72 /* Hyperlink.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Hyperlink.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		8D15BCAD2D709BA20021DC6D /* Exceptions for "Hyperlink" folder in "Hyperlink" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Preview Content/Preview Assets.xcassets",
+			);
+			target = 8D5EAC642D6F1CE60068F4C8 /* Hyperlink */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		8D5EAC672D6F1CE60068F4C8 /* Hyperlink */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				8D15BCAD2D709BA20021DC6D /* Exceptions for "Hyperlink" folder in "Hyperlink" target */,
+			);
 			path = Hyperlink;
 			sourceTree = "<group>";
 		};
@@ -23,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8D5EAC882D6F1E380068F4C8 /* LaunchAtLogin in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -33,16 +51,8 @@
 			isa = PBXGroup;
 			children = (
 				8D5EAC672D6F1CE60068F4C8 /* Hyperlink */,
-				8D5EAC662D6F1CE60068F4C8 /* Products */,
+				8DDFD5E52D70AB0600FFAA72 /* Hyperlink.app */,
 			);
-			sourceTree = "<group>";
-		};
-		8D5EAC662D6F1CE60068F4C8 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				8D5EAC652D6F1CE60068F4C8 /* Hyperlink.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -65,9 +75,10 @@
 			);
 			name = Hyperlink;
 			packageProductDependencies = (
+				8D5EAC872D6F1E380068F4C8 /* LaunchAtLogin */,
 			);
 			productName = Hyperlink;
-			productReference = 8D5EAC652D6F1CE60068F4C8 /* Hyperlink.app */;
+			productReference = 8DDFD5E52D70AB0600FFAA72 /* Hyperlink.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -82,6 +93,7 @@
 				TargetAttributes = {
 					8D5EAC642D6F1CE60068F4C8 = {
 						CreatedOnToolsVersion = 16.2;
+						LastSwiftMigration = 1620;
 					};
 				};
 			};
@@ -94,8 +106,11 @@
 			);
 			mainGroup = 8D5EAC5C2D6F1CE60068F4C8;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8D5EAC862D6F1E380068F4C8 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
+			);
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 8D5EAC662D6F1CE60068F4C8 /* Products */;
+			productRefGroup = 8D5EAC5C2D6F1CE60068F4C8;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -248,7 +263,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Hyperlink/Hyperlink.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -257,15 +275,19 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Hyperlink;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.padrewin.Hyperlink;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -275,7 +297,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = Hyperlink/Hyperlink.entitlements;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Hyperlink/HyperlinkRelease.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -284,11 +309,14 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Hyperlink;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.padrewin.Hyperlink;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -319,6 +347,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8D5EAC862D6F1E380068F4C8 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8D5EAC872D6F1E380068F4C8 /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D5EAC862D6F1E380068F4C8 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
+			productName = LaunchAtLogin;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8D5EAC5D2D6F1CE60068F4C8 /* Project object */;
 }
