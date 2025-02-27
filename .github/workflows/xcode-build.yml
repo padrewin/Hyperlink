@@ -1,31 +1,25 @@
 name: Build and Archive
-
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-
 jobs:
   build:
-    runs-on: macos-latest
-
+    runs-on: macos-14 # This should have access to newer Xcode versions
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
       - name: Set up Xcode
-        run: xcodebuild -version
-
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
       - name: Build and Archive
         run: |
-         xcodebuild -version
+          xcodebuild -version
           xcodebuild clean archive \
             -project Hyperlink.xcodeproj \
             -scheme "Hyperlink" \
             -configuration Release \
             -archivePath ${{ github.workspace }}/build/Hyperlink.xcarchive
-
       - name: Export IPA (if needed)
         run: |
           xcodebuild -exportArchive \
