@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,7 +15,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		8D15BCAD2D709BA20021DC6D /* Exceptions for "Hyperlink" folder in "Hyperlink" target */ = {
+		8D15BCAD2D709BA20021DC6D /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"Preview Content/Preview Assets.xcassets",
@@ -25,14 +25,7 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		8D5EAC672D6F1CE60068F4C8 /* Hyperlink */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				8D15BCAD2D709BA20021DC6D /* Exceptions for "Hyperlink" folder in "Hyperlink" target */,
-			);
-			path = Hyperlink;
-			sourceTree = "<group>";
-		};
+		8D5EAC672D6F1CE60068F4C8 /* Hyperlink */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (8D15BCAD2D709BA20021DC6D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Hyperlink; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +91,7 @@
 				};
 			};
 			buildConfigurationList = 8D5EAC602D6F1CE60068F4C8 /* Build configuration list for PBXProject "Hyperlink" */;
+			compatibilityVersion = "Xcode 15.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -109,7 +103,6 @@
 			packageReferences = (
 				8D5EAC862D6F1E380068F4C8 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 			);
-			preferredProjectObjectVersion = 77;
 			productRefGroup = 8D5EAC5C2D6F1CE60068F4C8;
 			projectDirPath = "";
 			projectRoot = "";
