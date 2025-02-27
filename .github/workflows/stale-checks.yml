@@ -1,0 +1,31 @@
+name: Check Stale Issues and PRs
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Run once a day at midnight UTC
+  workflow_dispatch:      # Allow manual triggering
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v8
+        with:
+          # Settings for both issues and PRs
+          stale-issue-message: 'This issue has been automatically marked as stale because it has had no activity for 60 days. It will be closed in 7 days if no further activity occurs. Thank you for your contributions!'
+          stale-pr-message: 'This pull request has been automatically marked as stale because it has had no activity for 60 days. It will be closed in 7 days if no further activity occurs. Thank you for your contributions!'
+          close-issue-message: 'This issue has been automatically closed due to inactivity. Feel free to reopen if this issue is still relevant.'
+          close-pr-message: 'This pull request has been automatically closed due to inactivity. Feel free to reopen if you wish to continue work on this PR.'
+          
+          # Label configuration
+          stale-issue-label: 'Stale'
+          stale-pr-label: 'Stale'
+          
+          # Timing configuration
+          days-before-stale: 60   # Mark as stale after 60 days of inactivity
+          days-before-close: 7    # Close 7 days after being marked stale
+          
+          # Activity configuration
+          exempt-issue-labels: 'pinned,security,help-wanted'
+          exempt-pr-labels: 'pinned,security,work-in-progress'
+          remove-stale-when-updated: true   # Remove stale label when updated
