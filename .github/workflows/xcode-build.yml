@@ -6,7 +6,7 @@ on:
     branches: [ master ]
 jobs:
   build:
-    runs-on: macos-14 # This should have access to newer Xcode versions
+    runs-on: macos-14
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -19,10 +19,30 @@ jobs:
             -project Hyperlink.xcodeproj \
             -scheme "Hyperlink" \
             -configuration Release \
-            -archivePath ${{ github.workspace }}/build/Hyperlink.xcarchive
+            -archivePath ${{ github.workspace }}/build/Hyperlink.xcarchive \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
       - name: Export IPA (if needed)
         run: |
+          # Create a minimal exportOptions.plist if it doesn't exist
+          if [ ! -f exportOptions.plist ]; then
+            cat > exportOptions.plist << EOF
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+            <plist version="1.0">
+            <dict>
+                <key>method</key>
+                <string>development</string>
+                <key>signingStyle</key>
+                <string>automatic</string>
+            </dict>
+            </plist>
+            EOF
+          fi
+          
           xcodebuild -exportArchive \
             -archivePath ${{ github.workspace }}/build/Hyperlink.xcarchive \
             -exportOptionsPlist exportOptions.plist \
-            -exportPath ${{ github.workspace }}/build
+            -exportPath ${{ github.workspace }}/build \
+            -allowProvisioningUpdates
