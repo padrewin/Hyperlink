@@ -2,8 +2,14 @@ name: Build and Archive
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'Hyperlink.xcodeproj/**'
+      - 'Hyperlink/**'
   pull_request:
     branches: [ master ]
+    paths:
+      - 'Hyperlink.xcodeproj/**'
+      - 'Hyperlink/**'
 jobs:
   build:
     runs-on: macos-14
