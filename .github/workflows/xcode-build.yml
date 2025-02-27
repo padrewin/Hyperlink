@@ -19,6 +19,7 @@ jobs:
 
       - name: Build and Archive
         run: |
+         xcodebuild -version
           xcodebuild clean archive \
             -project Hyperlink.xcodeproj \
             -scheme "Hyperlink" \
