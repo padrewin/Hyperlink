@@ -1,0 +1,33 @@
+name: Build and Archive
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Xcode
+        run: xcodebuild -version
+
+      - name: Build and Archive
+        run: |
+          xcodebuild clean archive \
+            -project Hyperlink.xcodeproj \
+            -scheme "Hyperlink" \
+            -configuration Release \
+            -archivePath ${{ github.workspace }}/build/Hyperlink.xcarchive
+
+      - name: Export IPA (if needed)
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath ${{ github.workspace }}/build/Hyperlink.xcarchive \
+            -exportOptionsPlist exportOptions.plist \
+            -exportPath ${{ github.workspace }}/build
