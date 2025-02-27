@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: ❓ Support Question
+    url: https://github.com/padrewin/Hyperlink/discussions
+    about: Use GitHub discussions feature for questions
+  - name: 👾 Discord server
+    url: https://discord.colddev.dev
+    about: Keep in touch in Discord server
