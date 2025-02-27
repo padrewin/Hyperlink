@@ -39,5 +39,5 @@ Hyperlink is a macOS menubar app that effortlessly grabs the URL from your activ
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/yourusername/Hyperlink.git
+   git clone https://github.com/padrewin/Hyperlink.git
    cd Hyperlink
