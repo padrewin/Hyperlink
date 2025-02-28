@@ -2,6 +2,13 @@
 
 Hyperlink is a macOS menubar app that effortlessly grabs the URL from your active browser tab and copies it to your clipboard. With customizable behaviors, keyboard shortcuts, and a sleek preferences window, Hyperlink streamlines your workflow for quickly accessing web addresses.
 
+<details>
+  <summary>Image Gallery</summary>
+
+![hyperlink-settings](https://github.com/user-attachments/assets/67b42f55-3258-4c64-95fc-9999ad630687)
+![hyperlink-browsers](https://github.com/user-attachments/assets/0e725d63-8d81-47a4-9ddf-9691218cfec9)
+</details>
+
 ## Features
 
 - **Menubar-Only App:**  
