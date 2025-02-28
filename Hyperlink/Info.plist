@@ -22,8 +22,8 @@
     <string>$(MACOSX_DEPLOYMENT_TARGET)</string>
     <key>LSUIElement</key>
     <true/>
-    <key>NSAppleEventsUsageDescription</key>
-    <string>URL Grabber needs AppleScript permission to access browser URLs.</string>
+<key>NSAppleEventsUsageDescription</key>
+<string>Hyperlink needs to access your browser to get the current URL.</string>
     <key>NSUserNotificationAlertStyle</key>
     <string>alert</string>
 </dict>
