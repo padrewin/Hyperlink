@@ -1,3 +1,6 @@
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/padrewin/Hyperlink/total?logo=files&logoColor=white&label=Downloads&color=green)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/padrewin/Hyperlink/xcode-build.yml?logo=GitHub&label=GitHub%20Build)
+
 # Hyperlink
 
 Hyperlink is a macOS menubar app that effortlessly grabs the URL from your active browser tab and copies it to your clipboard. With customizable behaviors, keyboard shortcuts, and a sleek preferences window, Hyperlink streamlines your workflow for quickly accessing web addresses.
@@ -5,6 +8,9 @@ Hyperlink is a macOS menubar app that effortlessly grabs the URL from your activ
 <details>
   <summary>Image Gallery</summary>
 
+https://github.com/user-attachments/assets/e94077d7-8b0b-453b-8c21-656d2c580738
+
+![hyperlink-notification](https://github.com/user-attachments/assets/a76ce18f-da6f-4a6a-afe4-5473e14c6c61)
 ![hyperlink-settings](https://github.com/user-attachments/assets/67b42f55-3258-4c64-95fc-9999ad630687)
 ![hyperlink-browsers](https://github.com/user-attachments/assets/0e725d63-8d81-47a4-9ddf-9691218cfec9)
 </details>
