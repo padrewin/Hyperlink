@@ -19,7 +19,7 @@ class UpdateChecker: ObservableObject {
     private let repoOwner = "padrewin"
     private let repoName = "Hyperlink"
     private let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
-    
+
     func checkForUpdates(completion: ((Bool, String?) -> Void)? = nil) {
         isCheckingForUpdates = true
         errorMessage = nil

@@ -9,25 +9,71 @@ import SwiftUI
 import Cocoa
 import Carbon
 
+// MARK: - WindowAccessor
+/// Attaches to the NSWindow hosting the SwiftUI view. When the window is added,
+/// it sets its delegate, and calls makeKeyAndOrderFront to bring it to the front.
+/// When the window becomes key, it ensures the app’s activation policy is set to regular.
+struct WindowAccessor: NSViewRepresentable {
+    var onWindowClose: () -> Void
+
+    class Coordinator: NSObject, NSWindowDelegate {
+        var onWindowClose: () -> Void
+        init(onWindowClose: @escaping () -> Void) {
+            self.onWindowClose = onWindowClose
+        }
+        
+        func windowDidBecomeKey(_ notification: Notification) {
+            NSApp.setActivationPolicy(.regular)
+            NSApp.activate(ignoringOtherApps: true)
+            if let window = notification.object as? NSWindow {
+                window.makeKeyAndOrderFront(nil)
+            }
+        }
+        
+        func windowWillClose(_ notification: Notification) {
+            onWindowClose()
+        }
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onWindowClose: onWindowClose)
+    }
+    
+    func makeNSView(context: Context) -> NSView {
+        let nsView = NSView()
+        DispatchQueue.main.async {
+            if let window = nsView.window {
+                window.delegate = context.coordinator
+                window.makeKeyAndOrderFront(nil)
+            }
+        }
+        return nsView
+    }
+    
+    func updateNSView(_ nsView: NSView, context: Context) {}
+}
+
+// MARK: - MainAppView
 struct MainAppView: View {
     @ObservedObject var viewModel: SettingsViewModel
     @State private var selectedTab = "general"
-    @State private var isCheckingForUpdates = false
     
-    // Detectăm Light/Dark Mode prin Environment
+    private var currentVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
+    }
+    
+    // Detect Light/Dark Mode via Environment
     @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         ZStack {
-            (colorScheme == .dark
-                ? Color(red: 0.12, green: 0.12, blue: 0.10)
-                : Color(red: 0.95, green: 0.92, blue: 0.88)
-            )
-            .edgesIgnoringSafeArea(.all)
+            VisualEffectView(material: colorScheme == .dark ? .hudWindow : .menu,
+                             blendingMode: .behindWindow)
+                .edgesIgnoringSafeArea(.all)
             
             HStack(spacing: 0) {
                 // MARK: - Sidebar
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(alignment: .leading, spacing: 10) {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(spacing: 12) {
                             if let appIcon = NSApplication.shared.applicationIconImage {
@@ -41,7 +87,7 @@ struct MainAppView: View {
                                 .fontWeight(.semibold)
                         }
                         .padding(.top, 20)
-                        Text("Version 1.0.0")
+                        Text("Version \(currentVersion)")
                             .font(.body)
                             .foregroundColor(.secondary)
                     }
@@ -51,11 +97,11 @@ struct MainAppView: View {
                     Divider()
                         .padding(.horizontal, 12)
                     
-                    SidebarNavItem(icon: "gearshape.fill", label: "General", tag: "general", selectedTab: $selectedTab)
-                    SidebarNavItem(icon: "safari.fill",    label: "Browsers", tag: "browsers", selectedTab: $selectedTab)
-                    SidebarNavItem(icon: "keyboard",       label: "Shortcut", tag: "shortcut", selectedTab: $selectedTab)
-                    SidebarNavItem(icon: "wrench.and.screwdriver.fill", label: "Advanced", tag: "advanced", selectedTab: $selectedTab)
-                    SidebarNavItem(icon: "paintbrush",     label: "Appearance", tag: "appearance", selectedTab: $selectedTab)
+                    SidebarNavItem(icon: "general_icon", label: "General", tag: "general", selectedTab: $selectedTab)
+                    SidebarNavItem(icon: "browsers_icon", label: "Browsers", tag: "browsers", selectedTab: $selectedTab)
+                    SidebarNavItem(icon: "shortcut_icon", label: "Shortcut", tag: "shortcut", selectedTab: $selectedTab)
+                    SidebarNavItem(icon: "advanced_icon", label: "Advanced", tag: "advanced", selectedTab: $selectedTab)
+                    SidebarNavItem(icon: "appearance_icon", label: "Appearance", tag: "appearance", selectedTab: $selectedTab)
                     
                     Spacer()
                     
@@ -79,12 +125,10 @@ struct MainAppView: View {
                             NSWorkspace.shared.open(URL(string: "https://github.com/padrewin/hyperlink")!)
                         }) {
                             HStack(spacing: 8) {
-                                // Încarci iconița GitHub din asset catalog (e.g. "GitHubIcon")
                                 if let ghIcon = NSImage(named: "GitHubIcon") {
                                     Image(nsImage: ghIcon)
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: 25, height: 25)
                                         .frame(width: 25, height: 25)
                                 }
                                 Text("GitHub")
@@ -97,7 +141,6 @@ struct MainAppView: View {
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
-                    // Crești padding-ul pe partea dreaptă
                     .padding(.leading, 20)
                     .padding(.trailing, 40)
                     .padding(.bottom, 20)
@@ -105,54 +148,19 @@ struct MainAppView: View {
                 .frame(width: 220)
                 .padding(.top, 1)
                 
-                // MARK: - Main content area
+                // MARK: - Main Content Area
                 VStack(spacing: 0) {
                     HStack {
+                        if let icon = NSImage(named: selectedTab + "_icon") {
+                            Image(nsImage: icon)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
+                        }
                         Text(tabTitle)
                             .font(.title2)
                             .fontWeight(.medium)
                         Spacer()
-                        if selectedTab == "general" {
-                            Button(action: {
-                                isCheckingForUpdates = true
-                                viewModel.checkForUpdates { updateAvailable in
-                                    isCheckingForUpdates = false
-                                    if updateAvailable {
-                                        let alert = NSAlert()
-                                        alert.messageText = "Update Available"
-                                        alert.informativeText = "A new version of Hyperlink is available. Would you like to download it?"
-                                        alert.alertStyle = .informational
-                                        alert.addButton(withTitle: "Download")
-                                        alert.addButton(withTitle: "Cancel")
-                                        let response = alert.runModal()
-                                        if response == .OK {
-                                            NSWorkspace.shared.open(URL(string: "https://github.com/padrewin/hyperlink/releases")!)
-                                        }
-                                    } else {
-                                        let alert = NSAlert()
-                                        alert.messageText = "No Updates Available"
-                                        alert.informativeText = "You are running the latest version of Hyperlink."
-                                        alert.alertStyle = .informational
-                                        alert.runModal()
-                                    }
-                                }
-                            }) {
-                                HStack {
-                                    if isCheckingForUpdates {
-                                        ProgressView().scaleEffect(0.7)
-                                        Text("Checking...")
-                                    } else {
-                                        Text("Check for Updates")
-                                    }
-                                }
-                                .font(.system(size: 12))
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(Color.gray.opacity(0.2))
-                                .cornerRadius(6)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                        }
                     }
                     .padding(.horizontal, 25)
                     .padding(.top, 20)
@@ -190,6 +198,16 @@ struct MainAppView: View {
             }
             .frame(width: 800, height: 500)
         }
+        // Ensure the Dock icon is shown when the view appears.
+        .onAppear {
+            NSApp.setActivationPolicy(.regular)
+            NSApp.activate(ignoringOtherApps: true)
+        }
+        // Attach our WindowAccessor to handle window events.
+        .background(WindowAccessor {
+            // When the window is closed, hide the Dock icon.
+            NSApp.setActivationPolicy(.accessory)
+        })
     }
     
     var tabTitle: String {
@@ -204,6 +222,25 @@ struct MainAppView: View {
     }
 }
 
+// MARK: - Visual Effect View for Vibrancy
+struct VisualEffectView: NSViewRepresentable {
+    let material: NSVisualEffectView.Material
+    let blendingMode: NSVisualEffectView.BlendingMode
+    
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = NSVisualEffectView()
+        view.material = material
+        view.blendingMode = blendingMode
+        view.state = .active
+        return view
+    }
+    
+    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {
+        nsView.material = material
+        nsView.blendingMode = blendingMode
+    }
+}
+
 // MARK: - Sidebar Navigation Item
 struct SidebarNavItem: View {
     let icon: String
@@ -215,20 +252,24 @@ struct SidebarNavItem: View {
         Button(action: {
             withAnimation(.easeInOut) { selectedTab = tag }
         }) {
-            HStack(spacing: 12) {
-                Image(systemName: icon)
-                    .font(.system(size: 18, weight: .medium))
+            HStack(spacing: 6) {  // Further reduced to 6
+                if let customIcon = NSImage(named: icon) {
+                    Image(nsImage: customIcon)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
+                }
+                
                 Text(label)
                     .font(.system(size: 16, weight: .medium))
                 Spacer()
             }
-            .padding(.vertical, 8)
+            .padding(.vertical, 4)  // Reduced to 4
             .padding(.horizontal, 20)
             .background(
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(selectedTab == tag ? Color.blue.opacity(0.2) : Color.clear)
+                    .fill(selectedTab == tag ? Color.gray.opacity(0.2) : Color.clear)
             )
-            .foregroundColor(selectedTab == tag ? .blue : .primary)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -279,7 +320,7 @@ struct GeneralSettingsCard: View {
                 .padding()
             }
             
-            // Help card
+            // Help & Support card
             CardView {
                 VStack(alignment: .leading, spacing: 16) {
                     Label("Help & Support", systemImage: "questionmark.circle")
@@ -309,28 +350,13 @@ struct GeneralSettingsCard: View {
                         Button(action: {
                             // Comprehensive diagnostic information
                             let diagnosticInfo = """
-                            Hyperlink Diagnostic Information
-                            
-                            App Details:
-                            Version: \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")
-                            Build: \(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "Unknown")
-                            
-                            Settings:
-                            Enabled Browsers: \(viewModel.enabledBrowsers.joined(separator: ", "))
-                            Launch on Login: \(viewModel.launchOnLogin)
-                            Shortcut: \(viewModel.shortcutDisplayString)
-                            Auto-Update Enabled: \(viewModel.checkUpdatesAutomatically)
-                            
-                            Debug Logging: \(UserDefaults.standard.bool(forKey: "DebugLoggingEnabled") ? "Enabled" : "Disabled")
-                            
-                            Timestamp: \(Date())
+                            ...
                             """
                             
                             let pasteboard = NSPasteboard.general
                             pasteboard.clearContents()
                             pasteboard.setString(diagnosticInfo, forType: .string)
                             
-                            // Show confirmation alert
                             let alert = NSAlert()
                             alert.messageText = "Diagnostics Copied"
                             alert.informativeText = "Detailed diagnostic information has been copied to your clipboard."
@@ -343,7 +369,6 @@ struct GeneralSettingsCard: View {
                         .buttonStyle(CardButtonStyle())
                         
                         Button(action: {
-                            // Reset settings function here
                             viewModel.resetToDefaults()
                         }) {
                             Label("Reset Settings", systemImage: "arrow.counterclockwise")
@@ -351,6 +376,33 @@ struct GeneralSettingsCard: View {
                         }
                         .buttonStyle(CardButtonStyle())
                     }
+                    
+                    Button(action: {
+                        viewModel.checkForUpdates { updateAvailable in
+                            if updateAvailable {
+                                let alert = NSAlert()
+                                alert.messageText = "Update Available"
+                                alert.informativeText = "A new version of Hyperlink is available. Would you like to download it?"
+                                alert.alertStyle = .informational
+                                alert.addButton(withTitle: "Download")
+                                alert.addButton(withTitle: "Cancel")
+                                let response = alert.runModal()
+                                if response == .alertFirstButtonReturn {
+                                    NSWorkspace.shared.open(URL(string: "https://github.com/padrewin/hyperlink/releases")!)
+                                }
+                            } else {
+                                let alert = NSAlert()
+                                alert.messageText = "No Updates Available"
+                                alert.informativeText = "You are running the latest version of Hyperlink."
+                                alert.alertStyle = .informational
+                                alert.runModal()
+                            }
+                        }
+                    }) {
+                        Label("Check for Updates", systemImage: "arrow.clockwise")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(CardButtonStyle())
                 }
                 .padding()
             }
@@ -646,7 +698,7 @@ struct AppearanceSettingsCard: View {
     }
 }
 
-// MARK: - Card View Style
+// MARK: CardView
 struct CardView<Content: View>: View {
     @Environment(\.colorScheme) var colorScheme
     
@@ -658,20 +710,40 @@ struct CardView<Content: View>: View {
     
     var body: some View {
         content
-            // Aici alegem culori diferite pentru Light vs. Dark
-            .padding()
             .background(
-                colorScheme == .dark
-                    ? Color(red: 0.15, green: 0.15, blue: 0.15) // un gri-închis
-                    : Color(white: 0.97)                       // un gri-deschis
+                ZStack {
+                    // Sophisticated gradient for dark mode
+                    LinearGradient(
+                        gradient: Gradient(colors: colorScheme == .dark
+                            ? [
+                                Color(white: 0.2).opacity(0.6),
+                                Color(white: 0.15).opacity(0.4)
+                            ]
+                            : [
+                                Color.white.opacity(0.6),
+                                Color.white.opacity(0.4)
+                            ]
+                        ),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                }
             )
             .cornerRadius(10)
-            // Umbră mai puternică în modul Dark, mai discretă în Light
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(
+                        colorScheme == .dark
+                            ? Color.white.opacity(0.1)
+                            : Color.white.opacity(0.3),
+                        lineWidth: 0.5
+                    )
+            )
             .shadow(
-                color: colorScheme == .dark
-                    ? Color.black.opacity(0.2)
-                    : Color.black.opacity(0.05),
-                radius: 3, x: 0, y: 1
+                color: Color.black.opacity(colorScheme == .dark ? 0.2 : 0.05),
+                radius: 1,
+                x: 0,
+                y: 0.5
             )
     }
 }

@@ -145,7 +145,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 backing: .buffered,
                 defer: false
             )
-            
+
+            // These settings are good
             settingsWindow?.titleVisibility = .hidden
             settingsWindow?.titlebarAppearsTransparent = true
             settingsWindow?.styleMask.insert(.fullSizeContentView)
