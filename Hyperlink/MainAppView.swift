@@ -379,23 +379,25 @@ struct GeneralSettingsCard: View {
                     
                     Button(action: {
                         viewModel.checkForUpdates { updateAvailable in
-                            if updateAvailable {
-                                let alert = NSAlert()
-                                alert.messageText = "Update Available"
-                                alert.informativeText = "A new version of Hyperlink is available. Would you like to download it?"
-                                alert.alertStyle = .informational
-                                alert.addButton(withTitle: "Download")
-                                alert.addButton(withTitle: "Cancel")
-                                let response = alert.runModal()
-                                if response == .alertFirstButtonReturn {
-                                    NSWorkspace.shared.open(URL(string: "https://github.com/padrewin/hyperlink/releases")!)
+                            DispatchQueue.main.async {
+                                if updateAvailable {
+                                    let alert = NSAlert()
+                                    alert.messageText = "Update Available"
+                                    alert.informativeText = "A new version of Hyperlink is available. Would you like to download it?"
+                                    alert.alertStyle = .informational
+                                    alert.addButton(withTitle: "Download")
+                                    alert.addButton(withTitle: "Cancel")
+                                    let response = alert.runModal()
+                                    if response == .alertFirstButtonReturn {
+                                        NSWorkspace.shared.open(URL(string: "https://github.com/padrewin/hyperlink/releases")!)
+                                    }
+                                } else {
+                                    let alert = NSAlert()
+                                    alert.messageText = "No Updates Available"
+                                    alert.informativeText = "You are running the latest version of Hyperlink."
+                                    alert.alertStyle = .informational
+                                    alert.runModal()
                                 }
-                            } else {
-                                let alert = NSAlert()
-                                alert.messageText = "No Updates Available"
-                                alert.informativeText = "You are running the latest version of Hyperlink."
-                                alert.alertStyle = .informational
-                                alert.runModal()
                             }
                         }
                     }) {
