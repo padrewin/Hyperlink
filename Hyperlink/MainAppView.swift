@@ -57,6 +57,7 @@ struct WindowAccessor: NSViewRepresentable {
 struct MainAppView: View {
     @ObservedObject var viewModel: SettingsViewModel
     @State private var selectedTab = "general"
+    @State private var isAudioWarmedUp = false
     
     private var currentVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
@@ -203,6 +204,7 @@ struct MainAppView: View {
             NSApp.setActivationPolicy(.regular)
             NSApp.activate(ignoringOtherApps: true)
         }
+        
         // Attach our WindowAccessor to handle window events.
         .background(WindowAccessor {
             // When the window is closed, hide the Dock icon.
@@ -436,9 +438,17 @@ struct BrowsersSettingsCard: View {
                             BrowserIconLoader.createBrowserIcon(for: browser)
                                 .frame(width: 24, height: 24)
                             
-                            // Browser name
-                            Text(browser)
-                                .frame(minWidth: 80, alignment: .leading)
+                            // Browser name + optional Arc tooltip
+                            HStack(alignment: .center, spacing: 6) {
+                                Text(browser)
+                                    .frame(minWidth: 20, alignment: .leading)
+                                if browser == "Arc" {
+                                    InfoTooltip(
+                                        text: "Arc has a built-in URL copy shortcut. Enabling this may cause conflicts.",
+                                        hoverDelay: 0.02
+                                    )
+                                }
+                            }
                             
                             Spacer()
                             
@@ -458,14 +468,6 @@ struct BrowsersSettingsCard: View {
                             .labelsHidden()
                         }
                         .padding(.vertical, 4)
-                        
-                        // Conditional warning for Arc
-                        if browser == "Arc" {
-                            Text("Arc has built-in URL copy shortcut. Enabling may cause conflicts.")
-                                .font(.caption)
-                                .foregroundColor(.red)
-                                .padding(.leading, 36)
-                        }
                         
                         if browser != orderedBrowsers().last! {
                             Divider()
@@ -589,10 +591,9 @@ struct ShortcutSettingsCard: View {
 // MARK: - Advanced Settings Card
 struct AdvancedSettingsCard: View {
     @ObservedObject var viewModel: SettingsViewModel
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            
             // 1) Debug options card
             CardView {
                 VStack(alignment: .leading, spacing: 12) {
@@ -626,8 +627,8 @@ struct AdvancedSettingsCard: View {
                 }
                 .padding()
             }
-            
-            // 2) Clipboard options
+
+            // 2) Clipboard Behavior card
             CardView {
                 VStack(alignment: .leading, spacing: 12) {
                     Label("Clipboard Behavior", systemImage: "doc.on.clipboard")
@@ -635,26 +636,44 @@ struct AdvancedSettingsCard: View {
                     
                     Divider()
                     
-                    // Inlocuim SegmentedPicker cu un dropdown
-                    Picker("After copying URL:", selection: Binding(
-                        get: { viewModel.urlCopyBehavior },
-                        set: { viewModel.setURLCopyBehavior($0) }
-                    )) {
-                        Text("Show Notification").tag(URLCopyBehavior.showNotification)
-                        Text("Silent Copy").tag(URLCopyBehavior.silentCopy)
-                        Text("Play Sound").tag(URLCopyBehavior.playSound)
-                    }
-                    .pickerStyle(MenuPickerStyle())
-                    
                     HStack {
-                        Label("Format URLs when copying", systemImage: "character.textbox")
+                        Label("Show Notification", systemImage: "bell")
                             .font(.body)
+                        Spacer()
+                        Toggle("", isOn: Binding(
+                            get: { viewModel.urlCopyBehavior.contains(.showNotification) },
+                            set: { viewModel.toggleBehavior(.showNotification, enabled: $0) }
+                        ))
+                        .toggleStyle(SwitchToggleStyle())
+                        .labelsHidden()
+                    }
+
+                    HStack {
+                        Label("Play Sound", systemImage: "speaker.wave.2")
+                            .font(.body)
+                        Spacer()
+                        Toggle("", isOn: Binding(
+                            get: { viewModel.urlCopyBehavior.contains(.playSound) },
+                            set: { viewModel.toggleBehavior(.playSound, enabled: $0) }
+                        ))
+                        .toggleStyle(SwitchToggleStyle())
+                        .labelsHidden()
+                    }
+
+                    HStack(alignment: .center, spacing: 6) {
+                        Label("Silent Copy", systemImage: "speaker.slash")
+                            .font(.body)
+                        
+                        InfoTooltip(
+                            text: "Enabling this option will stop any visual or audio feedback when copying.",
+                            hoverDelay: 0.02  // apare aproape instant
+                        )
                         
                         Spacer()
                         
                         Toggle("", isOn: Binding(
-                            get: { viewModel.formatURLWhenCopying },
-                            set: { viewModel.setURLFormatting(enabled: $0) }
+                            get: { viewModel.urlCopyBehavior.contains(.silentCopy) },
+                            set: { viewModel.toggleBehavior(.silentCopy, enabled: $0) }
                         ))
                         .toggleStyle(SwitchToggleStyle())
                         .labelsHidden()
@@ -662,8 +681,93 @@ struct AdvancedSettingsCard: View {
                 }
                 .padding()
             }
+
+            // 3) Sound Preferences card
+            Group {
+                CardView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label("Sound Preferences", systemImage: "speaker.wave.2")
+                            .font(.headline)
+ 
+                        Divider()
+ 
+                        ForEach([
+                            ("copy-sound", "Copy", "pencil"),
+                            ("scissors", "Scissors", "scissors"),
+                            ("page-chime", "Page Chime", "music.note")
+                        ], id: \.0) { (key, label, icon) in
+                            HStack {
+                                Label(label, systemImage: icon)
+                                    .font(.body)
+ 
+                                Button(action: {
+                                    ClipboardManager.shared.selectedSoundName = key
+                                    ClipboardManager.shared.playSound()
+                                }) {
+                                    Image(systemName: "play.circle.fill")
+                                        .foregroundColor(.accentColor)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+ 
+                                Spacer()
+ 
+                                Toggle("", isOn: Binding(
+                                    get: { viewModel.selectedSoundName == key },
+                                    set: { newValue in
+                                        if newValue {
+                                            viewModel.selectedSoundName = key
+                                            ClipboardManager.shared.selectedSoundName = key
+                                            ClipboardManager.shared.savePreferences()
+                                        }
+                                    }
+                                ))
+                                .toggleStyle(SwitchToggleStyle())
+                                .labelsHidden()
+                            }
+                        }
+                    }
+                    .padding()
+                }
+            }
+            .disabled(viewModel.urlCopyBehavior.contains(.silentCopy))
+            .opacity(viewModel.urlCopyBehavior.contains(.silentCopy) ? 0.4 : 1.0)
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
+    }
+}
+
+struct InfoTooltip: View {
+    let text: String
+    /// Intervalul de timp (în secunde) după care apare tooltip-ul
+    var hoverDelay: Double = 0.02
+    
+    @State private var isHovering = false
+    @State private var scheduledShow = false
+    
+    var body: some View {
+        // Pictograma sau elementul peste care faci hover
+        Image(systemName: "questionmark.circle")
+            .onHover { inside in
+                if inside {
+                    // Programăm afișarea popover-ului după `hoverDelay`
+                    scheduledShow = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + hoverDelay) {
+                        // Dacă încă suntem pe hover după 0.02s, afișăm popover-ul
+                        if scheduledShow {
+                            isHovering = true
+                        }
+                    }
+                } else {
+                    // Dacă ieșim cu mouse-ul, ascundem popover-ul imediat
+                    scheduledShow = false
+                    isHovering = false
+                }
+            }
+            // Poți afișa textul într-un popover
+            .popover(isPresented: $isHovering, arrowEdge: .top) {
+                Text(text)
+                    .padding(8)
+            }
     }
 }
 
@@ -758,9 +862,10 @@ struct CardButtonStyle: ButtonStyle {
             .foregroundColor(configuration.isPressed ? .gray : .primary)
             .background(
                 RoundedRectangle(cornerRadius: 6)
-                    .fill(configuration.isPressed ? 
-                          Color.gray.opacity(0.2) : 
+                    .fill(configuration.isPressed ?
+                          Color.gray.opacity(0.2) :
                           Color.gray.opacity(0.1))
             )
     }
 }
+
