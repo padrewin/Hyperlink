@@ -32,17 +32,17 @@ class ClipboardManager {
     
     // Current notification style
     var notificationStyle: ClipboardNotificationStyle = .showNotification
-    var shouldFormatURLs: Bool = false
+    var selectedSoundName: String = "copy-sound" // default value
     
     // Audio player for sound notifications
     private var audioPlayer: AVAudioPlayer?
     
     // Load sound file
     private func loadSound() {
-        guard audioPlayer == nil else { return }
+        audioPlayer = nil
         
         // Try to find the sound file in the bundle
-        if let soundURL = Bundle.main.url(forResource: "copy-sound", withExtension: "mp3") {
+        if let soundURL = Bundle.main.url(forResource: selectedSoundName, withExtension: "caf") {
             do {
                 audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
                 audioPlayer?.prepareToPlay()
@@ -56,15 +56,22 @@ class ClipboardManager {
     }
     
     // Play the notification sound
-    private func playSound() {
-        loadSound()
-        
-        if let player = audioPlayer {
-            player.currentTime = 0
-            player.play()
-        } else {
-            // Fallback to system sound
-            NSSound.beep()
+    func playSound() {
+        DispatchQueue.global(qos: .userInitiated).async {
+            // Load the sound on a background thread
+            self.audioPlayer = nil
+            self.loadSound()
+
+            // Switch back to main thread to actually play
+            DispatchQueue.main.async {
+                if let player = self.audioPlayer {
+                    player.currentTime = 0
+                    player.play()
+                } else {
+                    // Fallback to system sound
+                    NSSound.beep()
+                }
+            }
         }
     }
     
@@ -73,70 +80,34 @@ class ClipboardManager {
         if #available(macOS 10.14, *) {
             let center = UNUserNotificationCenter.current()
             let content = UNMutableNotificationContent()
-            content.title = "URL Copied"
+            content.title = "Hyperlink"
             content.body = url
             
             let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
             center.add(request)
         } else {
             let notification = NSUserNotification()
-            notification.title = "URL Copied"
+            notification.title = "Hyperlink"
             notification.informativeText = url
             NSUserNotificationCenter.default.deliver(notification)
         }
     }
     
-    // Format URL if needed
-    private func formatURL(_ url: String) -> String {
-        if shouldFormatURLs {
-            // Remove protocol if present
-            var formattedURL = url
-            let protocols = ["https://", "http://", "ftp://", "file://"]
-            for prefix in protocols {
-                if formattedURL.hasPrefix(prefix) {
-                    formattedURL = String(formattedURL.dropFirst(prefix.count))
-                    break
-                }
-            }
-            
-            // Remove trailing slash
-            if formattedURL.hasSuffix("/") {
-                formattedURL = String(formattedURL.dropLast())
-            }
-            
-            // Remove www. prefix
-            if formattedURL.hasPrefix("www.") {
-                formattedURL = String(formattedURL.dropFirst(4))
-            }
-            
-            return formattedURL
-        } else {
-            return url
-        }
-    }
-    
     // Copy URL to clipboard with appropriate notification
-    func copyURLToClipboard(_ url: String) {
+    func copyURLToClipboard(_ url: String, playSound: Bool, showNotification: Bool) {
         // Format URL if needed
-        let urlToCopy = formatURL(url)
+        let urlToCopy = url
         
         // Copy to clipboard
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
         pasteboard.setString(urlToCopy, forType: .string)
-        
-        // Notify based on style
-        switch notificationStyle {
-        case .showNotification:
-            showNotification(for: urlToCopy)
-        case .silent:
-            // Do nothing
-            break
-        case .playSound:
-            playSound()
-        case .soundAndNotification:
-            playSound()
-            showNotification(for: urlToCopy)
+
+        if playSound {
+            self.playSound()
+        }
+        if showNotification {
+            self.showNotification(for: urlToCopy)
         }
         
         print("URL copied to clipboard: \(urlToCopy)")
@@ -145,7 +116,7 @@ class ClipboardManager {
     // Save preferences
     func savePreferences() {
         UserDefaults.standard.set(notificationStyle.rawValue, forKey: "ClipboardNotificationStyle")
-        UserDefaults.standard.set(shouldFormatURLs, forKey: "ClipboardFormatURLs")
+        UserDefaults.standard.set(selectedSoundName, forKey: "ClipboardSoundName")
     }
     
     // Load preferences
@@ -154,8 +125,9 @@ class ClipboardManager {
            let style = ClipboardNotificationStyle(rawValue: styleRawValue) {
             notificationStyle = style
         }
-        
-        shouldFormatURLs = UserDefaults.standard.bool(forKey: "ClipboardFormatURLs")
+        if let savedSound = UserDefaults.standard.string(forKey: "ClipboardSoundName") {
+            selectedSoundName = savedSound
+        }
     }
     
     // Initialize
