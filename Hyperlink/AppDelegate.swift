@@ -12,6 +12,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var viewModel: SettingsViewModel!
     var soundPlayer: AVAudioPlayer?
     
+    
     // Local shortcut manager
     var localShortcutMonitor: Any? = nil
     var globalShortcutMonitor: Any? = nil
@@ -284,31 +285,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 let trimmedOutput = output.trimmingCharacters(in: .whitespacesAndNewlines)
                 print("osascript result: \(trimmedOutput)")
                 if !trimmedOutput.isEmpty && !trimmedOutput.contains("error") {
-                    let urlToCopy = viewModel.formatURL(trimmedOutput)
+                    let urlToCopy = trimmedOutput
                     let pasteboard = NSPasteboard.general
                     pasteboard.clearContents()
                     pasteboard.setString(urlToCopy, forType: .string)
                     
-                    switch viewModel.urlCopyBehavior {
-                    case .showNotification:
-                        if #available(macOS 10.14, *) {
-                            let center = UNUserNotificationCenter.current()
-                            let content = UNMutableNotificationContent()
-                            content.title = "Hyperlink"
-                            content.body = urlToCopy
-                            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
-                            center.add(request)
-                        } else {
-                            let notification = NSUserNotification()
-                            notification.title = "Hyperlink"
-                            notification.informativeText = urlToCopy
-                            NSUserNotificationCenter.default.deliver(notification)
-                        }
-                    case .silentCopy:
-                        break
-                    case .playSound:
-                        playCopySound()
-                    }
+                    ClipboardManager.shared.copyURLToClipboard(
+                        urlToCopy,
+                        playSound: viewModel.urlCopyBehavior.contains(.playSound),
+                        showNotification: viewModel.urlCopyBehavior.contains(.showNotification)
+                    )
                     print("Successfully copied URL: \(urlToCopy)")
                 } else {
                     print("Error in osascript output: \(trimmedOutput)")
