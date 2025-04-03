@@ -1,10 +1,12 @@
 import SwiftUI
 import Carbon
 
-enum URLCopyBehavior: Int, Codable {
-    case showNotification
-    case silentCopy
-    case playSound
+struct URLCopyBehavior: OptionSet {
+    let rawValue: Int
+    
+    static let showNotification = URLCopyBehavior(rawValue: 1 << 0)
+    static let playSound        = URLCopyBehavior(rawValue: 1 << 1)
+    static let silentCopy       = URLCopyBehavior(rawValue: 1 << 2)
 }
 
 class SettingsViewModel: ObservableObject {
@@ -26,10 +28,21 @@ class SettingsViewModel: ObservableObject {
     @Published var shortcutModifiers: UInt32
     @Published var checkUpdatesAutomatically: Bool = true
     @Published var debugLoggingEnabled: Bool = false
-    @Published var formatURLWhenCopying: Bool = false
     
     // Add URL copy behavior property
     @Published var urlCopyBehavior: URLCopyBehavior = .showNotification
+    
+    // Add the selected sound name property
+    @Published var selectedSoundName: String = "copy-sound" {
+        didSet {
+            UserDefaults.standard.set(selectedSoundName, forKey: "SelectedSoundName")
+            
+            ClipboardManager.shared.selectedSoundName = selectedSoundName
+            ClipboardManager.shared.savePreferences()
+            
+            print("New sound name saved: \(selectedSoundName)")
+        }
+    }
     
     // Add the updateChecker property
     let updateChecker = UpdateChecker()
@@ -69,52 +82,28 @@ class SettingsViewModel: ObservableObject {
         // Load auto update check preference
         self.checkUpdatesAutomatically = defaults.bool(forKey: "CheckUpdatesAutomatically")
         
-        self.formatURLWhenCopying = defaults.bool(forKey: "FormatURLWhenCopying")
-        
         // Load URL copy behavior
-        if let rawValue = defaults.object(forKey: "URLCopyBehavior") as? Int,
-           let behavior = URLCopyBehavior(rawValue: rawValue) {
-            self.urlCopyBehavior = behavior
-        }
+        let rawValue = defaults.integer(forKey: "URLCopyBehavior")
+        self.urlCopyBehavior = URLCopyBehavior(rawValue: rawValue)
+        
+        // Load selected sound name
+        self.selectedSoundName = defaults.string(forKey: "SelectedSoundName") ?? "copy-sound"
     }
     
-    // URL formatting method
-    func formatURL(_ url: String) -> String {
-        guard formatURLWhenCopying, var components = URLComponents(string: url) else {
-            return url
+    func toggleBehavior(_ behavior: URLCopyBehavior, enabled: Bool) {
+        if enabled {
+            if behavior == .silentCopy {
+                urlCopyBehavior = [.silentCopy]
+            } else {
+                urlCopyBehavior.remove(.silentCopy)
+                urlCopyBehavior.insert(behavior)
+            }
+        } else {
+            urlCopyBehavior.remove(behavior)
         }
-        
-        // Remove tracking parameters
-        let trackingParams = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"]
-        components.queryItems = components.queryItems?.filter { item in
-            return !trackingParams.contains(item.name)
-        }
-        
-        // Remove www
-        if components.host?.hasPrefix("www.") == true {
-            components.host = components.host?.replacingOccurrences(of: "www.", with: "")
-        }
-        
-        // Prefer HTTPS
-        if components.scheme == "http" {
-            components.scheme = "https"
-        }
-        
-        // Reconstruct URL
-        return components.url?.absoluteString ?? url
+        UserDefaults.standard.set(urlCopyBehavior.rawValue, forKey: "URLCopyBehavior")
     }
     
-    // Method to set URL formatting preference
-    func setURLFormatting(enabled: Bool) {
-        formatURLWhenCopying = enabled
-        UserDefaults.standard.set(enabled, forKey: "FormatURLWhenCopying")
-    }
-    
-    // Method to set URL copy behavior
-    func setURLCopyBehavior(_ behavior: URLCopyBehavior) {
-        urlCopyBehavior = behavior
-        UserDefaults.standard.set(behavior.rawValue, forKey: "URLCopyBehavior")
-    }
     
     func updateLoginSetting(enabled: Bool) {
         UserDefaults.standard.set(enabled, forKey: appDelegate.kLaunchOnLoginKey)
@@ -244,6 +233,10 @@ class SettingsViewModel: ObservableObject {
         // Reset other settings
         checkUpdatesAutomatically = true
         defaults.set(true, forKey: "CheckUpdatesAutomatically")
+        
+        // Reset selected sound name
+        selectedSoundName = "copy-sound"
+        defaults.set(selectedSoundName, forKey: "SelectedSoundName")
         
         print("All settings have been reset to defaults")
     }
