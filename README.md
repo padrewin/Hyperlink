@@ -48,6 +48,9 @@ https://github.com/user-attachments/assets/e94077d7-8b0b-453b-8c21-656d2c580738
 
 ## Installation
 
+You can find the installation steps below:
+- [**How to install — WIKI**](https://github.com/padrewin/Hyperlink/wiki/%F0%9F%93%98-Hyperlink-%E2%80%93-Wiki#%EF%B8%8F-how-to-install)
+
 ### Build from Source
 
 1. **Clone the Repository:**
