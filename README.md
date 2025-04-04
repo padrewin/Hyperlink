@@ -55,3 +55,13 @@ https://github.com/user-attachments/assets/e94077d7-8b0b-453b-8c21-656d2c580738
    ```bash
    git clone https://github.com/padrewin/Hyperlink.git
    cd Hyperlink
+
+## Star History
+
+<a href="https://www.star-history.com/#padrewin/Hyperlink&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=padrewin/Hyperlink&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=padrewin/Hyperlink&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=padrewin/Hyperlink&type=Date" />
+ </picture>
+</a>
