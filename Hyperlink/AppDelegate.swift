@@ -11,6 +11,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var settingsWindow: NSWindow?
     var viewModel: SettingsViewModel!
     var soundPlayer: AVAudioPlayer?
+    var isSimulatingKeyPress = false
     
     
     // Local shortcut manager
@@ -29,7 +30,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         "Firefox": "org.mozilla.firefox",
         "Opera": "com.operasoftware.Opera",
         "Vivaldi": "com.vivaldi.Vivaldi",
-        "Zen": "com.zen.Zen"
+        "Zen": "app.zen-browser.zen"
     ]
     
     // User defaults keys
@@ -188,22 +189,25 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         print("Registered shortcut: Key code \(shortcutKeyCode), Modifiers \(shortcutModifiers)")
         
+        globalShortcutMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self = self else { return }
+            // Ignorăm evenimentele simulate
+            if self.isSimulatingKeyPress { return }
+            if event.keyCode == self.shortcutKeyCode &&
+               event.modifierFlags.contains(NSEvent.ModifierFlags(rawValue: UInt(self.shortcutModifiers))) {
+                self.getCurrentURL()
+            }
+        }
+        
         localShortcutMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self = self else { return event }
+            if self.isSimulatingKeyPress { return event }
             if event.keyCode == self.shortcutKeyCode &&
                event.modifierFlags.contains(NSEvent.ModifierFlags(rawValue: UInt(self.shortcutModifiers))) {
                 self.getCurrentURL()
                 return nil
             }
             return event
-        }
-        
-        globalShortcutMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            guard let self = self else { return }
-            if event.keyCode == self.shortcutKeyCode &&
-               event.modifierFlags.contains(NSEvent.ModifierFlags(rawValue: UInt(self.shortcutModifiers))) {
-                self.getCurrentURL()
-            }
         }
     }
     
@@ -289,7 +293,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     let pasteboard = NSPasteboard.general
                     pasteboard.clearContents()
                     pasteboard.setString(urlToCopy, forType: .string)
-                    
                     ClipboardManager.shared.copyURLToClipboard(
                         urlToCopy,
                         playSound: viewModel.urlCopyBehavior.contains(.playSound),
@@ -297,14 +300,97 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     )
                     print("Successfully copied URL: \(urlToCopy)")
                 } else {
-                    print("Error in osascript output: \(trimmedOutput)")
-                    if trimmedOutput.contains("not allowed to send Apple events") {
-                        showPermissionError()
+                    print("AppleScript failed with output: \(trimmedOutput)")
+                    // Fallback logic:
+                    if browserName.lowercased() == "firefox" {
+                        print("Using fallback sequence (Cmd+L, Cmd+C) for Firefox")
+                        simulateFirefoxCopyURL()
+                    } else if browserName.lowercased() == "zen" {
+                        print("Using Zen shortcut simulation (Cmd+Shift+C)")
+                        simulateZenCopyURLShortcut()
+                    } else {
+                        print("Using fallback sequence (Cmd+L, Cmd+A, Cmd+C)")
+                        simulateCopyURLFallback()
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        if let fallbackURL = NSPasteboard.general.string(forType: .string) {
+                            ClipboardManager.shared.copyURLToClipboard(
+                                fallbackURL,
+                                playSound: self.viewModel.urlCopyBehavior.contains(.playSound),
+                                showNotification: self.viewModel.urlCopyBehavior.contains(.showNotification)
+                            )
+                            print("Fallback copied URL: \(fallbackURL)")
+                        } else {
+                            print("Fallback did not retrieve any URL")
+                        }
                     }
                 }
             }
         } catch {
             print("Failed to execute osascript: \(error)")
+            // Fallback logic in case of error
+            if browserName.lowercased() == "firefox" {
+                print("Using fallback sequence (Cmd+L, Cmd+C) for Firefox")
+                simulateFirefoxCopyURL()
+            } else if browserName.lowercased() == "zen" {
+                print("Using Zen shortcut simulation (Cmd+Shift+C)")
+                simulateZenCopyURLShortcut()
+            } else {
+                print("Using fallback sequence (Cmd+L, Cmd+A, Cmd+C)")
+                simulateCopyURLFallback()
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                if let fallbackURL = NSPasteboard.general.string(forType: .string) {
+                    ClipboardManager.shared.copyURLToClipboard(
+                        fallbackURL,
+                        playSound: self.viewModel.urlCopyBehavior.contains(.playSound),
+                        showNotification: self.viewModel.urlCopyBehavior.contains(.showNotification)
+                    )
+                    print("Fallback copied URL after error: \(fallbackURL)")
+                } else {
+                    print("Fallback did not retrieve any URL after error")
+                }
+            }
+        }
+    }
+    
+    func simulateKeyPress(keyCode: CGKeyCode, flags: CGEventFlags = []) {
+        guard let source = CGEventSource(stateID: .combinedSessionState) else { return }
+        let keyDown = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: true)
+        keyDown?.flags = flags
+        let keyUp = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: false)
+        keyUp?.flags = flags
+        keyDown?.post(tap: .cghidEventTap)
+        keyUp?.post(tap: .cghidEventTap)
+    }
+    
+    func simulateZenCopyURLShortcut() {
+        isSimulatingKeyPress = true
+        simulateKeyPress(keyCode: CGKeyCode(kVK_ANSI_C), flags: [.maskCommand, .maskShift])
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.isSimulatingKeyPress = false
+        }
+    }
+    
+    func simulateFirefoxCopyURL() {
+        isSimulatingKeyPress = true
+        simulateKeyPress(keyCode: CGKeyCode(kVK_ANSI_L), flags: [.maskCommand])
+        simulateKeyPress(keyCode: CGKeyCode(kVK_ANSI_C), flags: [.maskCommand])
+        simulateKeyPress(keyCode: CGKeyCode(kVK_ANSI_C), flags: [.maskCommand])
+        simulateKeyPress(keyCode: CGKeyCode(kVK_Escape), flags: [])
+        simulateKeyPress(keyCode: CGKeyCode(kVK_Escape), flags: [])
+        isSimulatingKeyPress = false
+    }
+    
+    func simulateCopyURLFallback() {
+        isSimulatingKeyPress = true
+        simulateKeyPress(keyCode: CGKeyCode(kVK_ANSI_L), flags: [.maskCommand])
+        usleep(150_000)
+        simulateKeyPress(keyCode: CGKeyCode(kVK_ANSI_A), flags: [.maskCommand])
+        usleep(150_000)
+        simulateKeyPress(keyCode: CGKeyCode(kVK_ANSI_C), flags: [.maskCommand])
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.isSimulatingKeyPress = false
         }
     }
     
