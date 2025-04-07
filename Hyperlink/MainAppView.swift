@@ -444,7 +444,12 @@ struct BrowsersSettingsCard: View {
                                     .frame(minWidth: 20, alignment: .leading)
                                 if browser == "Arc" {
                                     InfoTooltip(
-                                        text: "Arc has a built-in URL copy shortcut. Enabling this may cause conflicts.",
+                                        text: "Arc has a built-in URL copy shortcut. \nEnabling this may cause conflicts.",
+                                        hoverDelay: 0.02
+                                    )
+                                } else if browser == "Firefox" {
+                                    InfoTooltip(
+                                        text: "This will work only if \"devtools.policy.disabled\" is set to true in Mozilla to disable dev tools. \nOr using other shortcut than ⇧⌘C.",
                                         hoverDelay: 0.02
                                     )
                                 }
