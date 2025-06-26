@@ -417,7 +417,7 @@ struct GeneralSettingsCard: View {
 // MARK: - Browsers Settings Card
 struct BrowsersSettingsCard: View {
     @ObservedObject var viewModel: SettingsViewModel
-    private let browserOrder = ["Safari", "Chrome", "Arc", "Edge", "Brave", "Firefox", "Opera", "Vivaldi", "Zen"]
+    private let browserOrder = ["Safari", "Chrome", "Arc", "Edge", "Brave", "Firefox", "Opera", "Vivaldi", "Zen", "SigmaOS"]
     
     private func orderedBrowsers() -> [String] {
         return browserOrder.filter { viewModel.browsers.contains($0) }

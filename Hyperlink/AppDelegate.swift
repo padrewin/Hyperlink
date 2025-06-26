@@ -30,7 +30,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         "Firefox": "org.mozilla.firefox",
         "Opera": "com.operasoftware.Opera",
         "Vivaldi": "com.vivaldi.Vivaldi",
-        "Zen": "app.zen-browser.zen"
+        "Zen": "app.zen-browser.zen",
+        "SigmaOS": "com.sigmaos.sigmaos.macos"
     ]
     
     // User defaults keys
@@ -261,6 +262,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 "-e", "get URL of active tab of first window",
                 "-e", "end tell"
             ]
+        case browsers["SigmaOS"]:
+            args = [
+                "-e", "tell application \"SigmaOS\"",
+                "-e", "get URL of active tab of first window",
+                "-e", "end tell"
+            ]
         case browsers["Opera"]:
             args = [
                 "-e", "tell application \"Opera\"",
@@ -435,7 +442,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func checkImageAssets() {
         let browserLogos = ["safari-logo", "chrome-logo", "firefox-logo", "edge-logo", "brave-logo",
-                            "opera-logo", "arc-logo", "vivaldi-logo", "zen-logo"]
+                            "opera-logo", "arc-logo", "vivaldi-logo", "zen-logo", "sigmaos-logo"]
         for logoName in browserLogos {
             if let image = NSImage(named: logoName) {
                 print("✅ Found image asset: \(logoName), size: \(image.size)")

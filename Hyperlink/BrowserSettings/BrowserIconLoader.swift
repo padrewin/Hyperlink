@@ -64,6 +64,7 @@ struct BrowserIconLoader {
         case "arc": return .purple
         case "vivaldi": return .red
         case "zen": return .teal
+        case "sigmaos": return .orange
         default: return .gray
         }
     }

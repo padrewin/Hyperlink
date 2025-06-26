@@ -15,16 +15,39 @@
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.1</string>
+    <string>1.0.3</string>
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>LSMinimumSystemVersion</key>
     <string>$(MACOSX_DEPLOYMENT_TARGET)</string>
     <key>LSUIElement</key>
     <true/>
-<key>NSAppleEventsUsageDescription</key>
-<string>Hyperlink needs to access your browser to get the current URL.</string>
+    
+    <!-- Enhanced descriptions for permissions -->
+    <key>NSAppleEventsUsageDescription</key>
+    <string>Hyperlink copies the current URL from your browser when you press the configured keyboard shortcut. This requires permission to communicate with browser applications.</string>
+    
+    <!-- Add app metadata to appear more legitimate -->
+    <key>CFBundleGetInfoString</key>
+    <string>Hyperlink 1.0.3, URL copying utility</string>
+    
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2025 [Your Name/Organization]</string>
+    
+    <!-- App category for App Store (helps with classification) -->
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.utilities</string>
+    
+    <!-- Notification settings -->
     <key>NSUserNotificationAlertStyle</key>
     <string>alert</string>
+    
+    <!-- Optional: Add app icon reference -->
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    
+    <!-- Optional: Specify supported document types if any -->
+    <key>CFBundleDocumentTypes</key>
+    <array></array>
 </dict>
 </plist>
