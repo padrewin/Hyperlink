@@ -1,5 +1,7 @@
 import os, requests, xml.etree.ElementTree as ET
 from datetime import datetime
+from pathlib import Path
+import markdown
 
 REPO = os.getenv("GITHUB_REPOSITORY")
 RELEASE_TAG = os.getenv("RELEASE_TAG")
@@ -13,6 +15,12 @@ else:
 response = requests.get(api_url)
 data = response.json()
 
+# DEBUG (doar dacă ceva e în neregulă)
+if not isinstance(data, dict) or "tag_name" not in data:
+    print("❌ API GitHub nu a returnat un release valid:")
+    print(data)
+    raise SystemExit(1)
+
 # 2. Extrage datele
 try:
     version = data["tag_name"].lstrip("v")
@@ -22,10 +30,20 @@ try:
     asset = next(a for a in data["assets"] if a["name"].endswith(".zip"))
     zip_url = asset["browser_download_url"]
     length = asset["size"]
-except KeyError as e:
-    raise Exception(f"Key error: {e} — probabil JSON invalid: {data}")
+    release_notes_md = data.get("body", "No release notes provided.")
+except Exception as e:
+    print("❌ Eroare la extragerea datelor din JSON:")
+    print(data)
+    raise e
 
-# 3. Generează XML
+# 3. Generează release notes HTML și salvează
+release_notes_html = markdown.markdown(release_notes_md)
+notes_path = Path("website/public/updates/releasenotes")
+notes_path.mkdir(parents=True, exist_ok=True)
+notes_file = notes_path / f"{version}.html"
+notes_file.write_text(release_notes_html, encoding="utf-8")
+
+# 4. Generează appcast.xml
 rss = ET.Element("rss", version="2.0", attrib={
     "xmlns:sparkle": "http://www.andymatuschak.org/xml-namespaces/sparkle",
     "xmlns:dc": "http://purl.org/dc/elements/1.1/"
@@ -48,6 +66,7 @@ ET.SubElement(item, "enclosure", {
     "type": "application/octet-stream"
 })
 
-ET.ElementTree(rss).write("appcast.xml", encoding="utf-8", xml_declaration=True)
-with open("appcast.xml", "r") as f:
+ET.ElementTree(rss).write("website/public/updates/appcast.xml", encoding="utf-8", xml_declaration=True)
+print("✅ appcast.xml generat:")
+with open("website/public/updates/appcast.xml", "r") as f:
     print(f.read())
