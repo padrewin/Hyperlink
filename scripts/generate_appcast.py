@@ -69,7 +69,14 @@ ET.SubElement(item, "enclosure", {
     "type": "application/octet-stream"
 })
 
-ET.ElementTree(rss).write("website/public/updates/appcast.xml", encoding="utf-8", xml_declaration=True)
+import xml.dom.minidom
+
+rough_string = ET.tostring(rss, encoding="utf-8")
+reparsed = xml.dom.minidom.parseString(rough_string)
+pretty_xml = reparsed.toprettyxml(indent="  ")
+
+with open("website/public/updates/appcast.xml", "w", encoding="utf-8") as f:
+    f.write(pretty_xml)
+
 print("✅ appcast.xml generat:")
-with open("website/public/updates/appcast.xml", "r") as f:
-    print(f.read())
+print(pretty_xml)
