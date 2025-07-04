@@ -1,0 +1,43 @@
+name: Generate Appcast XML
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  generate-appcast:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Clone website repo
+        run: |
+          git clone https://x-access-token:${{ secrets.PAGES_TOKEN }}@github.com/padrewin/hyperlinkapp.github.io.git website
+          cd website
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Generate appcast.xml
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          mkdir -p website/public/updates
+          python scripts/generate_appcast.py > website/public/updates/appcast.xml
+
+      - name: Commit & Push
+        run: |
+          cd website
+          git add public/updates/appcast.xml
+          git commit -m "Update appcast.xml for $RELEASE_TAG"
+          git push
