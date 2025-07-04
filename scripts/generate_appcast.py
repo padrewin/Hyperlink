@@ -41,7 +41,7 @@ except Exception as e:
 
 # 3. Generează release notes HTML și salvează
 release_notes_html = markdown.markdown(release_notes_md)
-notes_path = Path("website/public/updates/releasenotes")
+notes_path = Path("website/updates/releasenotes")
 notes_path.mkdir(parents=True, exist_ok=True)
 notes_file = notes_path / f"{version}.html"
 notes_file.write_text(release_notes_html, encoding="utf-8")
@@ -75,7 +75,7 @@ rough_string = ET.tostring(rss, encoding="utf-8")
 reparsed = xml.dom.minidom.parseString(rough_string)
 pretty_xml = reparsed.toprettyxml(indent="  ")
 
-with open("website/public/updates/appcast.xml", "w", encoding="utf-8") as f:
+with open("website/updates/appcast.xml", "w", encoding="utf-8") as f:
     f.write(pretty_xml)
 
 print("✅ appcast.xml generat:")
