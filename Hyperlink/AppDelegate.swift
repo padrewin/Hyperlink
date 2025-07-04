@@ -8,8 +8,7 @@ import AVFoundation
 import Sparkle
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    // Eliminat pentru a preveni UI-ul automat Sparkle
-    // let updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+
     var statusBarItem: NSStatusItem!
     var settingsWindow: NSWindow?
     var viewModel: SettingsViewModel!

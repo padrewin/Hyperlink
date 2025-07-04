@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8D1FA8242E17C97C00AA46D9 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1FA8232E17C97C00AA46D9 /* Sparkle */; };
 		8D5EAC882D6F1E380068F4C8 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 8D5EAC872D6F1E380068F4C8 /* LaunchAtLogin */; };
+		8D85263A2E17DF0300408FFA /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 8D8526392E17DF0300408FFA /* Sparkle */; settings = {ATTRIBUTES = (Required, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,7 +35,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D5EAC882D6F1E380068F4C8 /* LaunchAtLogin in Frameworks */,
-				8D1FA8242E17C97C00AA46D9 /* Sparkle in Frameworks */,
+				8D85263A2E17DF0300408FFA /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,7 +47,15 @@
 			children = (
 				8D5EAC672D6F1CE60068F4C8 /* Hyperlink */,
 				8DDFD5E52D70AB0600FFAA72 /* Hyperlink.app */,
+				8D8526382E17DE3D00408FFA /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		8D8526382E17DE3D00408FFA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -71,7 +79,7 @@
 			name = Hyperlink;
 			packageProductDependencies = (
 				8D5EAC872D6F1E380068F4C8 /* LaunchAtLogin */,
-				8D1FA8232E17C97C00AA46D9 /* Sparkle */,
+				8D8526392E17DF0300408FFA /* Sparkle */,
 			);
 			productName = Hyperlink;
 			productReference = 8DDFD5E52D70AB0600FFAA72 /* Hyperlink.app */;
@@ -268,11 +276,13 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Hyperlink/URLGrabber.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 105;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Hyperlink/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -287,6 +297,8 @@
 				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.padrewin.Hyperlink;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -302,11 +314,13 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Hyperlink/URLGrabber.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 105;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Hyperlink/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -321,6 +335,8 @@
 				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.padrewin.Hyperlink;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -369,15 +385,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		8D1FA8232E17C97C00AA46D9 /* Sparkle */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 8D1FA8222E17C97C00AA46D9 /* XCRemoteSwiftPackageReference "Sparkle" */;
-			productName = Sparkle;
-		};
 		8D5EAC872D6F1E380068F4C8 /* LaunchAtLogin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8D5EAC862D6F1E380068F4C8 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
 			productName = LaunchAtLogin;
+		};
+		8D8526392E17DF0300408FFA /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D1FA8222E17C97C00AA46D9 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

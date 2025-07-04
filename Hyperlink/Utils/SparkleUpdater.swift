@@ -6,18 +6,13 @@ class SparkleUpdater: NSObject, SPUUpdaterDelegate {
 
     override init() {
         super.init()
-
-        updaterController = SPUStandardUpdaterController(
-            startingUpdater: true,
-            updaterDelegate: self,
-            userDriverDelegate: nil
-        )
+        updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: self, userDriverDelegate: nil)
     }
 
     func checkForUpdates() {
-        updaterController?.checkForUpdates(nil)
+        updaterController?.updater.checkForUpdates()
     }
-    
+
     func checkForUpdatesInBackground() {
         updaterController?.updater.checkForUpdatesInBackground()
     }
