@@ -33,14 +33,14 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          mkdir -p website/public/updates
+          mkdir -p website/updates website/updates/releasenotes
           echo "📦 GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
           echo "🏷️  RELEASE_TAG=$RELEASE_TAG"
-          python scripts/generate_appcast.py | tee website/public/updates/appcast.xml
+          python scripts/generate_appcast.py
 
       - name: Commit & Push
         run: |
           cd website
-          git add public/updates/appcast.xml
+          git add updates/appcast.xml updates/releasenotes/*.html
           git commit -m "Manual appcast.xml update"
           git push
