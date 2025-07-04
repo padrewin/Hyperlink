@@ -417,7 +417,7 @@ struct GeneralSettingsCard: View {
 // MARK: - Browsers Settings Card
 struct BrowsersSettingsCard: View {
     @ObservedObject var viewModel: SettingsViewModel
-    private let browserOrder = ["Safari", "Chrome", "Arc", "Edge", "Brave", "Firefox", "Opera", "Vivaldi", "Zen", "SigmaOS"]
+    private let browserOrder = ["Safari", "Chrome", "Arc", "Edge", "Brave", "Firefox", "Opera", "Vivaldi", "Zen", "SigmaOS","Dia"]
     
     private func orderedBrowsers() -> [String] {
         return browserOrder.filter { viewModel.browsers.contains($0) }
@@ -445,6 +445,11 @@ struct BrowsersSettingsCard: View {
                                 if browser == "Arc" {
                                     InfoTooltip(
                                         text: "Arc has a built-in URL copy shortcut. \nEnabling this may cause conflicts.",
+                                        hoverDelay: 0.02
+                                    )
+                                } else if browser == "Dia" {
+                                    InfoTooltip(
+                                        text: "Dia uses ⌘⇧C to copy the active tab’s URL. \nThis shortcut is simulated automatically.",
                                         hoverDelay: 0.02
                                     )
                                 } else if browser == "Firefox" {

@@ -15,9 +15,13 @@
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.3</string>
+    <string>1.0.5</string>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>105</string>
+    <key>SUFeedURL</key>
+    <string>https://hyperlink.colddev.dev/updates/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>6DboXKL1tAZc135bS8m+HVPOzd0HV/RXgEj/1v2v7aQ=</string>
     <key>LSMinimumSystemVersion</key>
     <string>$(MACOSX_DEPLOYMENT_TARGET)</string>
     <key>LSUIElement</key>
@@ -29,7 +33,7 @@
     
     <!-- Add app metadata to appear more legitimate -->
     <key>CFBundleGetInfoString</key>
-    <string>Hyperlink 1.0.3, URL copying utility</string>
+    <string>Hyperlink 1.0.5, URL copying utility</string>
     
     <key>NSHumanReadableCopyright</key>
     <string>Copyright © 2025 [Your Name/Organization]</string>

@@ -47,6 +47,8 @@ class SettingsViewModel: ObservableObject {
     // Add the updateChecker property
     let updateChecker = UpdateChecker()
     
+    private let sparkleUpdater = SparkleUpdater()
+    
     var browsers: [String] {
         return Array(appDelegate.browsers.keys)
     }
@@ -88,6 +90,12 @@ class SettingsViewModel: ObservableObject {
         
         // Load selected sound name
         self.selectedSoundName = defaults.string(forKey: "SelectedSoundName") ?? "copy-sound"
+        
+        if checkUpdatesAutomatically {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                self.sparkleUpdater.checkForUpdatesInBackground()
+            }
+        }
     }
     
     func toggleBehavior(_ behavior: URLCopyBehavior, enabled: Bool) {
@@ -123,6 +131,14 @@ class SettingsViewModel: ObservableObject {
         defaults.set(shortcutKeyCode, forKey: appDelegate.kShortcutKeyCodeKey)
         defaults.set(shortcutModifiers, forKey: appDelegate.kShortcutModifiersKey)
         
+        let launchedOnce = defaults.bool(forKey: "HasLaunchedOnce")
+        if checkUpdatesAutomatically && launchedOnce {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                self.sparkleUpdater.checkForUpdatesInBackground()
+            }
+        }
+        defaults.set(true, forKey: "HasLaunchedOnce")
+        
         // Register the new shortcut
         appDelegate.registerShortcut()
         
@@ -131,11 +147,7 @@ class SettingsViewModel: ObservableObject {
     }
     
     func checkForUpdates(completion: ((Bool) -> Void)? = nil) {
-        updateChecker.checkForUpdates { updateAvailable, _ in
-            DispatchQueue.main.async {
-                completion?(updateAvailable)
-            }
-        }
+        sparkleUpdater.checkForUpdates()
     }
     
     func setAutoUpdateCheck(enabled: Bool) {

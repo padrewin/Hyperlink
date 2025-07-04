@@ -5,13 +5,17 @@ import ServiceManagement
 import UserNotifications
 import ApplicationServices
 import AVFoundation
+import Sparkle
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    // Eliminat pentru a preveni UI-ul automat Sparkle
+    // let updaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
     var statusBarItem: NSStatusItem!
     var settingsWindow: NSWindow?
     var viewModel: SettingsViewModel!
     var soundPlayer: AVAudioPlayer?
     var isSimulatingKeyPress = false
+    var sparkleUpdater: SparkleUpdater?
     
     
     // Local shortcut manager
@@ -31,7 +35,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         "Opera": "com.operasoftware.Opera",
         "Vivaldi": "com.vivaldi.Vivaldi",
         "Zen": "app.zen-browser.zen",
-        "SigmaOS": "com.sigmaos.sigmaos.macos"
+        "SigmaOS": "com.sigmaos.sigmaos.macos",
+        "Dia": "company.thebrowser.dia"
     ]
     
     // User defaults keys
@@ -63,6 +68,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         setupMenuBar()
         checkAccessibilityPermissions()
         registerShortcut()
+        sparkleUpdater = SparkleUpdater()
+        // Bloc adăugat pentru actualizări automate Sparkle
+        let defaults = UserDefaults.standard
+        let launchedOnce = defaults.bool(forKey: "HasLaunchedOnce")
+        let checkUpdatesAutomatically = true // Poți lega asta de un toggle în ViewModel dacă vrei
+        if checkUpdatesAutomatically && launchedOnce {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                self.sparkleUpdater?.checkForUpdatesInBackground()
+            }
+        }
+        defaults.set(true, forKey: "HasLaunchedOnce")
         
         if #available(macOS 10.14, *) {
             UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
@@ -83,6 +99,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                                                selector: #selector(updateMenuBarIcon),
                                                name: NSNotification.Name("MenubarIconChanged"),
                                                object: nil)
+        print("✅ Sparkle updater ready")
     }
     
     func setupDefaultsIfNeeded() {
@@ -235,6 +252,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
         print("Detected browser: \(browserName)")
+        
+        if browserName.lowercased() == "dia" {
+            print("Using Dia shortcut simulation (Cmd+Shift+C)")
+            simulateZenCopyURLShortcut()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                if let fallbackURL = NSPasteboard.general.string(forType: .string) {
+                    ClipboardManager.shared.copyURLToClipboard(
+                        fallbackURL,
+                        playSound: self.viewModel.urlCopyBehavior.contains(.playSound),
+                        showNotification: self.viewModel.urlCopyBehavior.contains(.showNotification)
+                    )
+                    print("Dia copied URL: \(fallbackURL)")
+                } else {
+                    print("Dia fallback did not retrieve any URL")
+                }
+            }
+            return
+        }
         
         let task = Process()
         let pipe = Pipe()

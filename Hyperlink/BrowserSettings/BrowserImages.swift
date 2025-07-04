@@ -78,6 +78,19 @@ struct BrowserImages {
                     .background(Circle().fill(Color.gray.opacity(0.2)))
             }
             
+        case "dia":
+            if let image = NSImage(named: "dia-logo") {
+                Image(nsImage: image)
+                    .resizable()
+                    .frame(width: 20, height: 20)
+            } else {
+                Text("D")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.gray)
+                    .frame(width: 20, height: 20)
+                    .background(Circle().fill(Color.gray.opacity(0.2)))
+            }
+            
         default:
             Text(String(browser.prefix(1)))
                 .font(.system(size: 12, weight: .bold))
@@ -101,6 +114,7 @@ struct BrowserImages {
         case "vivaldi": return .red
         case "zen": return .teal
         case "sigmaos": return .gray
+        case "dia": return .pink
         default: return .gray
         }
     }

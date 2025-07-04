@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8D1FA8242E17C97C00AA46D9 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1FA8232E17C97C00AA46D9 /* Sparkle */; };
 		8D5EAC882D6F1E380068F4C8 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 8D5EAC872D6F1E380068F4C8 /* LaunchAtLogin */; };
 /* End PBXBuildFile section */
 
@@ -34,6 +35,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D5EAC882D6F1E380068F4C8 /* LaunchAtLogin in Frameworks */,
+				8D1FA8242E17C97C00AA46D9 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,6 +71,7 @@
 			name = Hyperlink;
 			packageProductDependencies = (
 				8D5EAC872D6F1E380068F4C8 /* LaunchAtLogin */,
+				8D1FA8232E17C97C00AA46D9 /* Sparkle */,
 			);
 			productName = Hyperlink;
 			productReference = 8DDFD5E52D70AB0600FFAA72 /* Hyperlink.app */;
@@ -102,6 +105,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				8D5EAC862D6F1E380068F4C8 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
+				8D1FA8222E17C97C00AA46D9 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			productRefGroup = 8D5EAC5C2D6F1CE60068F4C8;
 			projectDirPath = "";
@@ -266,7 +270,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 105;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Hyperlink/Preview Content\"";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -280,7 +284,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.padrewin.Hyperlink;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -300,7 +304,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 105;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Hyperlink/Preview Content\"";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -314,7 +318,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.padrewin.Hyperlink;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -346,6 +350,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		8D1FA8222E17C97C00AA46D9 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.7.1;
+			};
+		};
 		8D5EAC862D6F1E380068F4C8 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern.git";
@@ -357,6 +369,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8D1FA8232E17C97C00AA46D9 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D1FA8222E17C97C00AA46D9 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
 		8D5EAC872D6F1E380068F4C8 /* LaunchAtLogin */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8D5EAC862D6F1E380068F4C8 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
