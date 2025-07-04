@@ -27,7 +27,10 @@ try:
     pub_date = datetime.strptime(data["published_at"], "%Y-%m-%dT%H:%M:%SZ")
     pub_date_str = pub_date.strftime("%a, %d %b %Y %H:%M:%S +0000")
 
-    asset = next(a for a in data["assets"] if a["name"].endswith(".zip"))
+    asset = next((a for a in data["assets"] if a["name"].endswith(".dmg")), None)
+    if not asset:
+        raise Exception("❌ Nu s-a găsit niciun fișier .dmg în release-ul curent.")
+
     zip_url = asset["browser_download_url"]
     length = asset["size"]
     release_notes_md = data.get("body", "No release notes provided.")
