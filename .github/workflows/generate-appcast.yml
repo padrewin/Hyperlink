@@ -3,6 +3,7 @@ name: Generate Appcast XML
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   generate-appcast:
@@ -39,5 +40,5 @@ jobs:
         run: |
           cd website
           git add public/updates/appcast.xml
-          git commit -m "Update appcast.xml for $RELEASE_TAG"
+          git commit -m "Manual appcast.xml update"
           git push
