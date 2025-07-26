@@ -36,7 +36,7 @@
     <string>Hyperlink 1.0.5, URL copying utility</string>
     
     <key>NSHumanReadableCopyright</key>
-    <string>Copyright © 2025 [Your Name/Organization]</string>
+    <string>Copyright © 2025 [padrewin]</string>
     
     <!-- App category for App Store (helps with classification) -->
     <key>LSApplicationCategoryType</key>
@@ -53,5 +53,8 @@
     <!-- Optional: Specify supported document types if any -->
     <key>CFBundleDocumentTypes</key>
     <array></array>
+
+    <key>NSAppSleepDisabled</key>
+<true/>
 </dict>
 </plist>
